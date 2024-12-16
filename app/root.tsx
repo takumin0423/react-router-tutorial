@@ -1,6 +1,4 @@
 import {
-  Form,
-  Link,
   Outlet,
   Scripts,
   ScrollRestoration,
@@ -9,72 +7,18 @@ import {
 import type { Route } from "./+types/root";
 
 import appStylesHref from "./app.css?url";
-import { getContacts } from "./data";
+import { createEmptyContact } from "./data";
 
-export async function clientLoader() {
-  const contacts = await getContacts();
+export async function action() {
+  const contact = await createEmptyContact();
 
-  return { contacts };
+  return { contact };
 }
 
-export default function App({ loaderData }: Route.ComponentProps) {
-  const { contacts } = loaderData;
-
-  return (
-    <>
-      <div id="sidebar">
-        <h1>React Router Contacts</h1>
-        <div>
-          <Form id="search-form" role="search">
-            <input
-              aria-label="Search contacts"
-              id="q"
-              name="q"
-              placeholder="Search"
-              type="search"
-            />
-            <div aria-hidden hidden={true} id="search-spinner" />
-          </Form>
-          <Form method="post">
-            <button type="submit">New</button>
-          </Form>
-        </div>
-        <nav>
-          {contacts.length ? (
-            <ul>
-              {contacts.map((contact) => (
-                <li key={contact.id}>
-                  <Link to={`contacts/${contact.id}`}>
-                    {contact.first || contact.last ? (
-                      <>
-                        {contact.first} {contact.last}
-                      </>
-                    ) : (
-                      <i>No Name</i>
-                    )}
-                    {contact.favorite ? <span>★</span> : null}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>
-              <i>No contacts</i>
-            </p>
-          )}
-        </nav>
-      </div>
-
-      <div id="detail">
-        <Outlet />
-      </div>
-    </>
-  );
+export default function App() {
+  return <Outlet />;
 }
 
-// The Layout component is a special export for the root route.
-// It acts as your document's "app shell" for all route components, HydrateFallback, and ErrorBoundary
-// For more information, see https://reactrouter.com/explanation/special-files#layout-export
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -92,8 +36,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-// The top most error boundary for the app, rendered when your app throws an error
-// For more information, see https://reactrouter.com/start/framework/route-module#errorboundary
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";
